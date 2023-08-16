@@ -215,8 +215,11 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '^[\\+-]$',
+            print(parsedList);
             arg1 = evaluate(get(parsedList, _i - 1));
             arg2 = evaluate(get(parsedList, _i + 1));
+            print(arg1);
+            print(arg2);
             result = call (get(global_plusMap, _), arg1, arg2);
             if (length(parsedList) == 3,
                 return (result),
