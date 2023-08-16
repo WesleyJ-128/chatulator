@@ -107,6 +107,20 @@ global_plusMap = {};
 put(global_plusMap, '+', _(x, y) -> (x + y));
 put(global_plusMap, '-', _(x, y) -> (x - y));
 
+binaryInfixOp(operatorMap, operator, index, workingList) -> (
+    if (type(get(workingList, index - 1)) == 'list',
+                arg1 = evaluate(get(workingList, index - 1)),
+            // Else
+                arg1 = number(get(workingList, index - 1))
+            );
+            if (type(get(workingList, index + 1)) == 'list',
+                arg2 = evaluate(get(workingList, index + 1)),
+            // Else
+                arg2 = number(get(workingList, index + 1))
+            );
+            return (call (get(operatorMap, operator), arg1, arg2));
+);
+
 evaluate(parsedList) -> (
     //print('Input:' + parsedList);
     if ((length(parsedList) == 1),
@@ -199,17 +213,7 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '[\\*/]',
-            if (type(get(parsedList, _i - 1)) == 'list',
-                arg1 = evaluate(get(parsedList, _i - 1)),
-            // Else
-                arg1 = number(get(parsedList, _i - 1))
-            );
-            if (type(get(parsedList, _i + 1)) == 'list',
-                arg2 = evaluate(get(parsedList, _i + 1)),
-            // Else
-                arg2 = number(get(parsedList, _i + 1))
-            );
-            result = call (get(global_multMap, _), arg1, arg2);
+            result = binaryInfixOp(global_multMap, _, _i, parsedList);
             if (length(parsedList) == 3,
                 return (result),
             // Else
@@ -231,20 +235,7 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '^[\\+-]$',
-            print(parsedList);
-            if (type(get(parsedList, _i - 1)) == 'list',
-                arg1 = evaluate(get(parsedList, _i - 1)),
-            // Else
-                arg1 = number(get(parsedList, _i - 1))
-            );
-            if (type(get(parsedList, _i + 1)) == 'list',
-                arg2 = evaluate(get(parsedList, _i + 1)),
-            // Else
-                arg2 = number(get(parsedList, _i + 1))
-            );
-            print(arg1);
-            print(arg2);
-            result = call (get(global_plusMap, _), arg1, arg2);
+            result = binaryInfixOp(global_plusMap, _, _i, parsedList);
             if (length(parsedList) == 3,
                 return (result),
             // Else
