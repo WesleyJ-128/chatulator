@@ -99,6 +99,9 @@ put(global_functions, 'atan', _(x) -> atan(x));
 put(global_functions, 'rad', _(x) -> rad(x));
 put(global_functions, 'deg', _(x) -> deg(x));
 
+global_expMap = {};
+put(global_expMap, '^', _(x, y) -> (x ^ y));
+
 global_multMap = {};
 put(global_multMap, '*', _(x, y) -> (x * y));
 put(global_multMap, '/', _(x, y) -> (x / y));
@@ -119,6 +122,22 @@ binaryInfixOp(operatorMap, operator, index, workingList) -> (
                 arg2 = number(get(workingList, index + 1))
             );
             return (call (get(operatorMap, operator), arg1, arg2));
+);
+
+binaryInfixOpAssembleList(index, workingList, result) -> (
+    newList = [];
+    if (index - 2 > 0,
+        for (slice(workingList, 0, index - 1),
+            put(newList, null, _)
+        );
+    );
+    put(newList, null, result);
+    if (index + 2 < length(workingList),
+        for (slice(workingList, index + 2),
+            put(newList, null, _)
+        )
+    );
+    return (newList);
 );
 
 evaluate(parsedList) -> (
@@ -181,33 +200,11 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '\\^',
-            if (type(get(parsedList, _i - 1)) == 'list',
-                base = evaluate(get(parsedList, _i - 1)),
-            // Else
-                base = number(get(parsedList, _i - 1))
-            );
-            if (type(get(parsedList, _i + 1)) == 'list',
-                exp = evaluate(get(parsedList, _i + 1)),
-            // Else
-                exp = number(get(parsedList, _i + 1))
-            );
-            result = base ^ exp;
+            result = binaryInfixOp(global_expMap, _, _i, parsedList);
             if (length(parsedList) == 3,
                 return (result),
-            // Else
-                newList = [];
-                if (_i - 2 > 0,
-                    for (slice(parsedList, 0, _i - 1),
-                        put(newList, null, _)
-                    );
-                );
-                put(newList, null, result);
-                if (_i + 2 < length(parsedList),
-                    for (slice(parsedList, _i + 2),
-                        put(newList, null, _)
-                    )
-                );
-                return (evaluate(newList))
+            // Else    
+                return (evaluate(binaryInfixOpAssembleList(_i, parsedList, result)))
             )
         )
     );
@@ -217,19 +214,7 @@ evaluate(parsedList) -> (
             if (length(parsedList) == 3,
                 return (result),
             // Else
-                newList = [];
-                if (_i - 2 > 0,
-                    for (slice(parsedList, 0, _i - 1),
-                        put(newList, null, _)
-                    );
-                );
-                put(newList, null, result);
-                if (_i + 2 < length(parsedList),
-                    for (slice(parsedList, _i + 2),
-                        put(newList, null, _)
-                    )
-                );
-                return (evaluate(newList))
+                return (evaluate(binaryInfixOpAssembleList(_i, parsedList, result)))
             )
         )
     );
@@ -239,19 +224,7 @@ evaluate(parsedList) -> (
             if (length(parsedList) == 3,
                 return (result),
             // Else
-                newList = [];
-                if (_i - 2 > 0,
-                    for (slice(parsedList, 0, _i - 1),
-                        put(newList, null, _)
-                    );
-                );
-                put(newList, null, result);
-                if (_i + 2 < length(parsedList),
-                    for (slice(parsedList, _i + 2),
-                        put(newList, null, _)
-                    )
-                );
-                return (evaluate(newList))
+                return (evaluate(binaryInfixOpAssembleList(_i, parsedList, result)))
             )
         )
     );
