@@ -99,16 +99,21 @@ put(global_functions, 'atan', _(x) -> atan(x));
 put(global_functions, 'rad', _(x) -> rad(x));
 put(global_functions, 'deg', _(x) -> deg(x));
 
-global_expMap = {};
-put(global_expMap, '^', _(x, y) -> (x ^ y));
+expMap = {};
+put(expMap, '^', _(x, y) -> (x ^ y));
 
-global_multMap = {};
-put(global_multMap, '*', _(x, y) -> (x * y));
-put(global_multMap, '/', _(x, y) -> (x / y));
+multMap = {};
+put(multMap, '*', _(x, y) -> (x * y));
+put(multMap, '/', _(x, y) -> (x / y));
 
-global_plusMap = {};
-put(global_plusMap, '+', _(x, y) -> (x + y));
-put(global_plusMap, '-', _(x, y) -> (x - y));
+plusMap = {};
+put(plusMap, '+', _(x, y) -> (x + y));
+put(plusMap, '-', _(x, y) -> (x - y));
+
+global_opMaps = [];
+put(global_opMaps, null, expMap);
+put(global_opMaps, null, multMap);
+put(global_opMaps, null, plusMap);
 
 binaryInfixOp(operatorMap, operator, index, workingList) -> (
     if (type(get(workingList, index - 1)) == 'list',
@@ -198,36 +203,18 @@ evaluate(parsedList) -> (
             )
         );
     );
-    for (parsedList,
-        if (_ ~ '\\^',
-            result = binaryInfixOp(global_expMap, _, _i, parsedList);
-            if (length(parsedList) == 3,
-                return (result),
-            // Else    
-                return (evaluate(binaryInfixOpAssembleList(_i, parsedList, result)))
+    c_for(j = 0, j < length(global_opMaps), j = j + 1,
+        for (parsedList,
+            if (has(global_opMaps, j, _),
+                result = binaryInfixOp(get(global_opMaps, j), _, _i, parsedList);
+                if (length(parsedList) == 3,
+                    return (result),
+                // Else    
+                    return (evaluate(binaryInfixOpAssembleList(_i, parsedList, result)))
+                )
             )
         )
-    );
-    for (parsedList,
-        if (_ ~ '[\\*/]',
-            result = binaryInfixOp(global_multMap, _, _i, parsedList);
-            if (length(parsedList) == 3,
-                return (result),
-            // Else
-                return (evaluate(binaryInfixOpAssembleList(_i, parsedList, result)))
-            )
-        )
-    );
-    for (parsedList,
-        if (_ ~ '^[\\+-]$',
-            result = binaryInfixOp(global_plusMap, _, _i, parsedList);
-            if (length(parsedList) == 3,
-                return (result),
-            // Else
-                return (evaluate(binaryInfixOpAssembleList(_i, parsedList, result)))
-            )
-        )
-    );
+    )
 );
 
 round_toward_zero(x) -> (
