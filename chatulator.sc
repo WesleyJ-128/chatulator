@@ -264,14 +264,15 @@ __on_player_message(player, message) ->
             expression = replace(expression, '(?<![\\d\\)])-(?=\\()', '-1*');
             global_answer = evaluate(parse(tokenize(expression)));
             global_output = round_precision(global_answer, 4);
-            if ((global_answer <= 1e-4) || (global_answer >= 1e6),
-                exponent = round_toward_zero(log10(global_answer));
-                mantissa = round_precision(global_answer / (10 ^ exponent), 4);
+            if (((abs(global_answer) <= 1e-4) || (abs(global_answer) >= 1e6)) && global_answer != 0,
+                sign = global_answer / abs(global_answer);
+                exponent = round_toward_zero(log10(abs(global_answer)));
+                mantissa = round_precision(abs(global_answer) / (10 ^ exponent), 4);
                 if (mantissa < 1,
                     mantissa = mantissa * 10;
                     exponent = exponent - 1
                 );
-                global_output = mantissa + 'e' + exponent
+                global_output = (mantissa * sign) + 'e' + exponent
             );
             schedule(0, _() -> print('= ' + global_output))
         )
