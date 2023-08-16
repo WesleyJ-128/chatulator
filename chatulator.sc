@@ -167,16 +167,8 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '\\^',
-            if (type(get(parsedList, _i - 1)) == 'list',
-                base = evaluate(get(parsedList, _i - 1)),
-            // Else
-                base = number(get(parsedList, _i - 1))
-            );
-            if (type(get(parsedList, _i + 1)) == 'list',
-                exp = evaluate(get(parsedList, _i + 1)),
-            // Else
-                exp = number(get(parsedList, _i + 1))
-            );
+            base = evaluate(get(parsedList, _i - 1));
+            exp = evaluate(get(parsedList, _i + 1));
             result = base ^ exp;
             if (length(parsedList) == 3,
                 return (result),
@@ -199,16 +191,8 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '[\\*/]',
-            if (type(get(parsedList, _i - 1)) == 'list',
-                arg1 = evaluate(get(parsedList, _i - 1)),
-            // Else
-                arg1 = number(get(parsedList, _i - 1))
-            );
-            if (type(get(parsedList, _i + 1)) == 'list',
-                arg2 = evaluate(get(parsedList, _i + 1)),
-            // Else
-                arg2 = number(get(parsedList, _i + 1))
-            );
+            arg1 = evaluate(get(parsedList, _i - 1));
+            arg2 = evaluate(get(parsedList, _i + 1));
             result = call (get(global_multMap, _), arg1, arg2);
             if (length(parsedList) == 3,
                 return (result),
@@ -231,16 +215,8 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '^[\\+-]$',
-            if (type(get(parsedList, _i - 1)) == 'list',
-                arg1 = evaluate(get(parsedList, _i - 1)),
-            // Else
-                arg1 = number(get(parsedList, _i - 1))
-            );
-            if (type(get(parsedList, _i + 1)) == 'list',
-                arg2 = evaluate(get(parsedList, _i + 1)),
-            // Else
-                arg2 = number(get(parsedList, _i + 1))
-            );
+            arg1 = evaluate(get(parsedList, _i - 1));
+            arg2 = evaluate(get(parsedList, _i + 1));
             result = call (get(global_plusMap, _), arg1, arg2);
             if (length(parsedList) == 3,
                 return (result),
