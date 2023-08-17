@@ -15,6 +15,7 @@
 //      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 tokenize(expression) -> (
+    //print(expression);
     expList = split(expression);
     tokenList = [];
     subExpression = '';
@@ -50,6 +51,7 @@ tokenize(expression) -> (
             );
         lastChar = _
     );
+    //print(tokenList);
     return (tokenList);
 );
 
@@ -58,11 +60,11 @@ parse(tokenList) -> (
     for (tokenList,
         if (_ ~ '^\\(',
             parsedList += parse(tokenize(_ ~ '(?<=.).*')),
-        (_ ~ '^[A-Za-z]'), // Else if
-            parsedList += _ ~ '^[A-Za-z]+';
+        (_ ~ '^[a-z]'), // Else if
+            parsedList += _ ~ '^[a-z]+';
             args = _ ~ '(?<=\\().*';
             if (args != null,
-                parsedList += parse(tokenize(_ ~ '(?<=\\().*'))
+                parsedList += parse(tokenize(args))
             ),
         // Else
             parsedList += _
@@ -148,6 +150,7 @@ binaryInfixOpAssembleList(index, workingList, result) -> (
 evaluate(parsedList) -> (
     //print('Input:' + parsedList);
     if ((length(parsedList) == 1),
+        //print('length1');
         if (has(global_constants, get(parsedList, 0)),
             return (call (get(global_constants, get(parsedList, 0)))),
         // Else
@@ -156,6 +159,7 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (has(global_constants, _),
+            //print('evaluatingconstant');
             result = call (get(global_constants, _));
             if (length(parsedList) == 1,
                 return (result),
@@ -178,6 +182,7 @@ evaluate(parsedList) -> (
     );
     for (parsedList,
         if (_ ~ '[a-z]+',
+            //print('evaluatingfunction');
             if (type(get(parsedList, _i + 1)) == 'list',
                 arg = evaluate(get(parsedList, _i + 1)),
             // Else
@@ -206,6 +211,7 @@ evaluate(parsedList) -> (
     c_for(j = 0, j < length(global_opMaps), j = j + 1,
         for (parsedList,
             if (has(global_opMaps, j, _),
+                //print('evaluating' + _);
                 result = binaryInfixOp(get(global_opMaps, j), _, _i, parsedList);
                 if (length(parsedList) == 3,
                     return (result),
@@ -239,7 +245,11 @@ __on_player_message(player, message) ->
         // Else
             expression = message ~ '(?<=.).*';
             expression = replace(expression, ' ', '');
+            expression = lower(expression);
             expression = replace(expression, '(?<![\\d\\)])-(?=\\()', '-1*');
+            expression = replace(expression, '(\\d)(?=[a-z])', '$1\\*');
+            expression = replace(expression, '\\)(?=[\\d\\(])', '\\)\\*');
+            expression = replace(expression, '(?<=\\d)\\(', '*(');
             global_answer = evaluate(parse(tokenize(expression)));
             global_output = round_precision(global_answer, 4);
             if (((abs(global_answer) <= 1e-4) || (abs(global_answer) >= 1e6)) && global_answer != 0,
