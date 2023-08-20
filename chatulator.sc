@@ -223,16 +223,6 @@ evaluate(parsedList) -> (
     )
 );
 
-round_toward_zero(x) -> (
-    if (x > 0,
-        return (floor(x)),
-    x < 0, // Else If
-        return (ceil(x)),
-    // Else
-        return (x)
-    )
-);
-
 round_precision(x, digits) -> (
     shift = 10 ^ digits;
     return (round(x * shift) / shift)
@@ -254,12 +244,8 @@ __on_player_message(player, message) ->
             global_output = round_precision(global_answer, 4);
             if (((abs(global_answer) <= 1e-4) || (abs(global_answer) >= 1e6)) && global_answer != 0,
                 sign = global_answer / abs(global_answer);
-                exponent = round_toward_zero(log10(abs(global_answer)));
+                exponent = floor(log10(abs(global_answer)));
                 mantissa = round_precision(abs(global_answer) / (10 ^ exponent), 4);
-                if (mantissa < 1,
-                    mantissa = mantissa * 10;
-                    exponent = exponent - 1
-                );
                 global_output = (mantissa * sign) + 'e' + exponent
             );
             schedule(0, _() -> print('= ' + global_output))
