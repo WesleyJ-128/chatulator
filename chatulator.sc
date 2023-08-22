@@ -16,14 +16,21 @@
 
 __config()-> {
     'commands' -> {
-        'scientificNotation <enable>' -> 'enableSciNot'
+        'enableScientificNotation <enable>' -> 'enableSciNot',
+        'configScientificNotation <which> <num>' -> 'configSciNot'
     },
     'arguments' -> {
-        'enable' -> {'type' -> 'bool'}
+        'enable' -> {'type' -> 'bool'},
+        'which' -> {'type' -> 'string', 'suggest' -> ['upper', 'lower']},
+        'num' -> {'type' -> 'int', 'min' -> -12, 'max' -> 307, 'suggest' -> [6, -4]}
     }
 };
 
 global_sciNot = true;
+global_lowerSciNotMag = -4;
+global_upperSciNotMag = 6;
+global_lowerSciNotLim = 10 ^ global_lowerSciNotMag;
+global_upperSciNotLim = 10 ^ global_upperSciNotMag;
 
 enableSciNot(boolean) -> (
     global_sciNot = boolean;
@@ -31,6 +38,20 @@ enableSciNot(boolean) -> (
         print('Enabled Scientific Notation'),
     // Else
         print('Disabled Scientific Notation')
+    )
+);
+
+configSciNot(select, num) -> (
+    if (select == 'upper',
+        global_upperSciNotMag = num;
+        global_upperSciNotLim = 10 ^ global_upperSciNotMag;
+        print('Set upper limit to 1e' + num),
+    select == 'lower', // Else if
+        global_lowerSciNotMag = num;
+        global_lowerSciNotLim = 10 ^ global_lowerSciNotMag;
+        print('Set lower limit to 1e' + num),
+    // Else
+        print(format('r Invalid argument: must be \'upper\' or \'lower\'.'))    
     )
 );
 
@@ -262,7 +283,7 @@ __on_player_message(player, message) ->
             expression = replace(expression, '(?<=\\d)\\(', '*(');
             global_answer = evaluate(parse(tokenize(expression)));
             global_output = round_precision(global_answer, 4);
-            if (global_sciNot && global_answer != 0 && ((abs(global_answer) <= 1e-4) || (abs(global_answer) >= 1e6)),
+            if (global_sciNot && global_answer != 0 && ((abs(global_answer) <= global_lowerSciNotLim) || (abs(global_answer) >= global_upperSciNotLim)),
                 sign = global_answer / abs(global_answer);
                 exponent = floor(log10(abs(global_answer)));
                 mantissa = round_precision(abs(global_answer) / (10 ^ exponent), 4);
