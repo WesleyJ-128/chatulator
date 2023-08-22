@@ -14,6 +14,26 @@
 //      You should have received a copy of the GNU General Public License
 //      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+__config()-> {
+    'commands' -> {
+        'scientificNotation <enable>' -> 'enableSciNot'
+    },
+    'arguments' -> {
+        'enable' -> {'type' -> 'bool'}
+    }
+};
+
+global_sciNot = true;
+
+enableSciNot(boolean) -> (
+    global_sciNot = boolean;
+    if (boolean,
+        print('Enabled Scientific Notation'),
+    // Else
+        print('Disabled Scientific Notation')
+    )
+);
+
 tokenize(expression) -> (
     //print(expression);
     expList = split(expression);
@@ -242,7 +262,7 @@ __on_player_message(player, message) ->
             expression = replace(expression, '(?<=\\d)\\(', '*(');
             global_answer = evaluate(parse(tokenize(expression)));
             global_output = round_precision(global_answer, 4);
-            if (((abs(global_answer) <= 1e-4) || (abs(global_answer) >= 1e6)) && global_answer != 0,
+            if (global_sciNot && global_answer != 0 && ((abs(global_answer) <= 1e-4) || (abs(global_answer) >= 1e6)),
                 sign = global_answer / abs(global_answer);
                 exponent = floor(log10(abs(global_answer)));
                 mantissa = round_precision(abs(global_answer) / (10 ^ exponent), 4);
