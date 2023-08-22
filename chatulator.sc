@@ -248,6 +248,6 @@ __on_player_message(player, message) ->
                 mantissa = round_precision(abs(global_answer) / (10 ^ exponent), 4);
                 global_output = (mantissa * sign) + 'e' + exponent
             );
-            schedule(0, _() -> print('= ' + global_output))
+            schedule(1, _() -> print('= ' + global_output))
         )
     )
