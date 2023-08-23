@@ -20,14 +20,16 @@ __config()-> {
         'configScientificNotation <bound> <magnitude>' -> 'configSciNot',
         'enableRounding <enable>' -> 'enableRound',
         'configRounding <digits>' -> 'configRound',
-        'restoreDefaults' -> 'setDefault'
+        'restoreDefaults' -> 'setDefault',
+        'test' -> 'saveSettings'
     },
     'arguments' -> {
         'enable' -> {'type' -> 'bool'},
         'bound' -> {'type' -> 'string', 'suggest' -> ['upper', 'lower']},
         'magnitude' -> {'type' -> 'int', 'min' -> -13, 'max' -> 307, 'suggest' -> [6, -4]},
         'digits' -> {'type' -> 'int', 'min' -> 0, 'max' -> 13, 'suggest' -> [4]}
-    }
+    },
+    'command_permission' -> 'players'
 };
 
 global_sciNot = true;
@@ -37,6 +39,22 @@ global_upperSciNotMag = 6;
 global_lowerSciNotLim = 10 ^ global_lowerSciNotMag;
 global_upperSciNotLim = 10 ^ global_upperSciNotMag;
 global_roundPrecision = 4;
+
+saveSettings() -> (
+    nbtTag = encode_nbt({
+        'scientificNotation' -> global_sciNot,
+        'rounding' -> global_round,
+        'upperLimitMag' -> global_upperSciNotMag,
+        'lowerLimitMag' -> global_lowerSciNotMag,
+        'roundPrecision' -> global_roundPrecision
+    });
+    success = store_app_data(nbtTag);
+    if (success,
+        print(format('e Settings Saved Successfully')),
+    // Else
+        print(format('r Failed to Save Settings!'))
+    )
+);
 
 enableSciNot(boolean) -> (
     global_sciNot = boolean;
