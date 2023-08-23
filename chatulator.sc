@@ -17,20 +17,26 @@
 __config()-> {
     'commands' -> {
         'enableScientificNotation <enable>' -> 'enableSciNot',
-        'configScientificNotation <which> <num>' -> 'configSciNot'
+        'configScientificNotation <bound> <magnitude>' -> 'configSciNot',
+        'enableRounding <enable>' -> 'enableRound',
+        'configRounding <digits>' -> 'configRound',
+        'restoreDefaults' -> 'setDefault'
     },
     'arguments' -> {
         'enable' -> {'type' -> 'bool'},
-        'which' -> {'type' -> 'string', 'suggest' -> ['upper', 'lower']},
-        'num' -> {'type' -> 'int', 'min' -> -12, 'max' -> 307, 'suggest' -> [6, -4]}
+        'bound' -> {'type' -> 'string', 'suggest' -> ['upper', 'lower']},
+        'magnitude' -> {'type' -> 'int', 'min' -> -13, 'max' -> 307, 'suggest' -> [6, -4]},
+        'digits' -> {'type' -> 'int', 'min' -> 0, 'max' -> 13, 'suggest' -> [4]}
     }
 };
 
 global_sciNot = true;
+global_round = true;
 global_lowerSciNotMag = -4;
 global_upperSciNotMag = 6;
 global_lowerSciNotLim = 10 ^ global_lowerSciNotMag;
 global_upperSciNotLim = 10 ^ global_upperSciNotMag;
+global_roundPrecision = 4;
 
 enableSciNot(boolean) -> (
     global_sciNot = boolean;
@@ -53,6 +59,28 @@ configSciNot(select, num) -> (
     // Else
         print(format('r Invalid argument: must be \'upper\' or \'lower\'.'))    
     )
+);
+
+enableRound(boolean) -> (
+    global_round = boolean;
+    if (boolean,
+        print('Enabled Rounding'),
+    // Else
+        print('Disabled Rounding')
+    )
+);
+
+configRound(digits) -> (
+    global_roundPrecision = digits;
+    print('Set rounding precision to ' + digits + ' digits')
+);
+
+setDefault() -> (
+    enableSciNot(true);
+    configSciNot('upper', 6);
+    configSciNot('lower', -4);
+    enableRound(true);
+    configRound(4);
 );
 
 tokenize(expression) -> (
@@ -282,11 +310,11 @@ __on_player_message(player, message) ->
             expression = replace(expression, '\\)(?=[\\d\\(])', '\\)\\*');
             expression = replace(expression, '(?<=\\d)\\(', '*(');
             global_answer = evaluate(parse(tokenize(expression)));
-            global_output = round_precision(global_answer, 4);
+            if(global_round, global_output = round_precision(global_answer, global_roundPrecision), global_output = global_answer);
             if (global_sciNot && global_answer != 0 && ((abs(global_answer) <= global_lowerSciNotLim) || (abs(global_answer) >= global_upperSciNotLim)),
                 sign = global_answer / abs(global_answer);
                 exponent = floor(log10(abs(global_answer)));
-                mantissa = round_precision(abs(global_answer) / (10 ^ exponent), 4);
+                mantissa = abs(global_output) / (10 ^ exponent);
                 global_output = (mantissa * sign) + 'e' + exponent
             );
             schedule(1, _() -> print('= ' + global_output))
