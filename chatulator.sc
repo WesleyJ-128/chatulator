@@ -16,9 +16,9 @@
 
 __config()-> {
     'commands' -> {
-        'enableScientificNotation <enable>' -> 'enableSciNot',
+        'enableScientificNotation <enable>' -> ['enableFunction', 'Scientific Notation'],
         'configScientificNotation <bound> <magnitude>' -> 'configSciNot',
-        'enableRounding <enable>' -> 'enableRound',
+        'enableRounding <enable>' -> ['enableFunction', 'Rounding'],
         'configRounding <digits>' -> 'configRound',
         'restoreDefaults' -> 'setDefault',
         'listSettings' -> 'printSettings'
@@ -48,12 +48,17 @@ saveSettings() -> (
     )
 );
 
-enableSciNot(boolean) -> (
-    global_sciNot = boolean;
+enableFunction(boolean, which) -> (
+    scientificnotation = global_sciNot;
+    rounding = global_round;
+    variable = lower(replace(which, ' ', ''));
+    var(variable) = boolean;
+    global_sciNot = scientificnotation;
+    global_round = rounding;
     if (boolean,
-        print('Enabled Scientific Notation'),
+        print('Enabled ' + which),
     // Else
-        print('Disabled Scientific Notation')
+        print('Disabled ' + which)
     );
     saveSettings()
 );
@@ -69,16 +74,6 @@ configSciNot(select, num) -> (
         print('Set lower limit to 1e' + num),
     // Else
         print(format('r Invalid argument: must be \'upper\' or \'lower\'.'))    
-    );
-    saveSettings()
-);
-
-enableRound(boolean) -> (
-    global_round = boolean;
-    if (boolean,
-        print('Enabled Rounding'),
-    // Else
-        print('Disabled Rounding')
     );
     saveSettings()
 );
