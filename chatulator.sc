@@ -15,6 +15,7 @@
 //      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 __config()-> {
+    'scope' -> 'player',
     'commands' -> {
         'enableScientificNotation <enable>' -> ['enableFunction', 'Scientific Notation'],
         'configScientificNotation <bound> <magnitude>' -> 'configSciNot',
