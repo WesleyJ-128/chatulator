@@ -21,7 +21,8 @@ __config()-> {
         'enableRounding <enable>' -> 'enableRound',
         'configRounding <digits>' -> 'configRound',
         'restoreDefaults' -> 'setDefault',
-        'test' -> 'saveSettings'
+        'save' -> 'saveSettings',
+        'load' -> 'loadSettings'
     },
     'arguments' -> {
         'enable' -> {'type' -> 'bool'},
@@ -99,6 +100,32 @@ setDefault() -> (
     configSciNot('lower', -4);
     enableRound(true);
     configRound(4);
+);
+
+loadSettings() -> (
+    nbtTag = load_app_data();
+    if (nbtTag == null,
+        print(format('y No saved settings found. Configuring and storing defaults.'));
+        setDefault();
+        saveSettings(),
+    // Else
+        mapData = parse_nbt(nbtTag);
+        global_sciNot = mapData:'scientificNotation';
+        global_round = mapData:'rounding';
+        global_lowerSciNotMag = mapData:'lowerLimitMag';
+        global_upperSciNotMag = mapData:'upperLimitMag';
+        global_lowerSciNotLim = 10 ^ global_lowerSciNotMag;
+        global_upperSciNotLim = 10 ^ global_upperSciNotMag;
+        global_roundPrecision = mapData:'roundPrecision';
+        print(format('e Saved Settings Restored'))
+    )
+);
+
+printSettings() -> (
+    print('Rounding Enabled: ' + global_round);
+    print('Rounding Precision (digits): ' + global_roundPrecision);
+    print('Scientific Notation Enabled: ' + global_sciNot);
+    print('Scientific Notation used for magnitudes greater than 1e' + global_upperSciNotMag + ' or lesser than 1e' + global_lowerSciNotMag)
 );
 
 tokenize(expression) -> (
