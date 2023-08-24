@@ -32,14 +32,6 @@ __config()-> {
     'command_permission' -> 'players'
 };
 
-global_sciNot = true;
-global_round = true;
-global_lowerSciNotMag = -4;
-global_upperSciNotMag = 6;
-global_lowerSciNotLim = 10 ^ global_lowerSciNotMag;
-global_upperSciNotLim = 10 ^ global_upperSciNotMag;
-global_roundPrecision = 4;
-
 saveSettings() -> (
     nbtTag = encode_nbt({
         'scientificNotation' -> global_sciNot,
@@ -98,19 +90,29 @@ configRound(digits) -> (
 );
 
 setDefault() -> (
-    enableSciNot(true);
-    configSciNot('upper', 6);
-    configSciNot('lower', -4);
-    enableRound(true);
-    configRound(4)
+    global_sciNot = true;
+    global_round = true;
+    global_lowerSciNotMag = -4;
+    global_upperSciNotMag = 6;
+    global_lowerSciNotLim = 10 ^ global_lowerSciNotMag;
+    global_upperSciNotLim = 10 ^ global_upperSciNotMag;
+    global_roundPrecision = 4;
+    printSettings();
+    saveSettings()
+);
+
+printSettings() -> (
+    print('Rounding Enabled: ' + global_round);
+    print('Rounding Precision (digits): ' + global_roundPrecision);
+    print('Scientific Notation Enabled: ' + global_sciNot);
+    print('Scientific Notation used for magnitudes greater than 1e' + global_upperSciNotMag + ' or less than 1e' + global_lowerSciNotMag)
 );
 
 loadSettings() -> (
     nbtTag = load_app_data();
     if (nbtTag == null,
         print(format('y No saved settings found. Configuring and storing defaults.'));
-        setDefault();
-        saveSettings(),
+        setDefault(),
     // Else
         mapData = parse_nbt(nbtTag);
         global_sciNot = mapData:'scientificNotation';
@@ -126,13 +128,6 @@ loadSettings() -> (
 
 __on_start() -> (
     loadSettings()
-);
-
-printSettings() -> (
-    print('Rounding Enabled: ' + global_round);
-    print('Rounding Precision (digits): ' + global_roundPrecision);
-    print('Scientific Notation Enabled: ' + global_sciNot);
-    print('Scientific Notation used for magnitudes greater than 1e' + global_upperSciNotMag + ' or lesser than 1e' + global_lowerSciNotMag)
 );
 
 tokenize(expression) -> (
