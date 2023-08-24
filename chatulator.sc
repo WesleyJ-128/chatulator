@@ -21,8 +21,7 @@ __config()-> {
         'enableRounding <enable>' -> 'enableRound',
         'configRounding <digits>' -> 'configRound',
         'restoreDefaults' -> 'setDefault',
-        'save' -> 'saveSettings',
-        'load' -> 'loadSettings'
+        'listSettings' -> 'printSettings'
     },
     'arguments' -> {
         'enable' -> {'type' -> 'bool'},
@@ -63,7 +62,8 @@ enableSciNot(boolean) -> (
         print('Enabled Scientific Notation'),
     // Else
         print('Disabled Scientific Notation')
-    )
+    );
+    saveSettings()
 );
 
 configSciNot(select, num) -> (
@@ -77,7 +77,8 @@ configSciNot(select, num) -> (
         print('Set lower limit to 1e' + num),
     // Else
         print(format('r Invalid argument: must be \'upper\' or \'lower\'.'))    
-    )
+    );
+    saveSettings()
 );
 
 enableRound(boolean) -> (
@@ -86,12 +87,14 @@ enableRound(boolean) -> (
         print('Enabled Rounding'),
     // Else
         print('Disabled Rounding')
-    )
+    );
+    saveSettings()
 );
 
 configRound(digits) -> (
     global_roundPrecision = digits;
-    print('Set rounding precision to ' + digits + ' digits')
+    print('Set rounding precision to ' + digits + ' digits');
+    saveSettings()
 );
 
 setDefault() -> (
@@ -99,7 +102,7 @@ setDefault() -> (
     configSciNot('upper', 6);
     configSciNot('lower', -4);
     enableRound(true);
-    configRound(4);
+    configRound(4)
 );
 
 loadSettings() -> (
@@ -119,6 +122,10 @@ loadSettings() -> (
         global_roundPrecision = mapData:'roundPrecision';
         print(format('e Saved Settings Restored'))
     )
+);
+
+__on_start() -> (
+    loadSettings()
 );
 
 printSettings() -> (
