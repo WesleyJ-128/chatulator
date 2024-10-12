@@ -219,6 +219,7 @@ put(expMap, '^', _(x, y) -> (x ^ y));
 multMap = {};
 put(multMap, '*', _(x, y) -> (x * y));
 put(multMap, '/', _(x, y) -> (x / y));
+put(multMap, '%', _(x, y) -> (x % y));
 
 plusMap = {};
 put(plusMap, '+', _(x, y) -> (x + y));
