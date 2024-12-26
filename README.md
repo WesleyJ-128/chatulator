@@ -6,6 +6,7 @@ Once the script is installed and loaded with the command `/script load chatulato
 # Functionality
 `>` "Command prompt"; start a chat message with this to tell the app it's an expression to be evaluated.  So `> 5 + 3` will return `8`, and `5 + 3` will do nothing.  The answer is printed only to the person who triggered the script, but your expression is still a regular chat message and thus visible to other players.
 <br>`+ - * / ^`: Works as expected. Use with or without surrounding spaces.
+<br>`%`: Modulo operator.  Ex. `>5 % 3` returns `2`.
 <br>`()`: Work as expected. Implicit multiplication works, but don't try it with a constant (`>(pi)(5)` works just fine, but `>pi(5)` will break.  However, `>5pi` also works.)
 <br>`e` and `pi`: Useful constants, use like numbers.
 <br>`ans`: The last value calculated.  Note that the calculator stores the exact value, not necessarily the rounded value shown.
