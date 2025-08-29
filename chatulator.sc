@@ -264,6 +264,9 @@ evaluate(parsedList) -> (
     //print('Input:' + parsedList);
     if ((length(parsedList) == 1),
         //print('length1');
+        if(type(parsedList:0) == 'list',
+            return (evaluate(parsedList:0))
+        );
         if (has(global_constants, get(parsedList, 0)),
             return (call (get(global_constants, get(parsedList, 0)))),
         // Else
