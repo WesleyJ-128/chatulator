@@ -134,18 +134,18 @@ tokenize(expression) -> (
     parenCount = 0;
     lastChar = '';
     for (expList,
-        if (((_ ~ '[\\.\\w]') || ((_ ~ '-') && !(lastChar ~ '[\\)\\w]'))) && (parenCount == 0),
+        if (((_ ~ '[\\.\\w]') || ((_ == '-') && !(lastChar ~ '[\\)\\w]'))) && (parenCount == 0),
             subExpression += _,
-        (_ ~ '\\(') && (parenCount == 0), // Else if
+        (_ == '(') && (parenCount == 0), // Else if
             subExpression += _;
             parenCount = 1,
-        (_ ~ '\\)') && (parenCount == 1), // Else if
+        (_ == ')') && (parenCount == 1), // Else if
             parenCount = 0,
         parenCount != 0, // Else if
             subExpression += _;
-            if (_ ~ '\\(',
+            if (_ == '(',
                 parenCount += 1,    
-            _ ~ '\\)', //Else if
+            _ == ')', //Else if
                 parenCount = parenCount - 1
             ),
         // Else:
@@ -170,8 +170,8 @@ tokenize(expression) -> (
 parse(tokenList) -> (
     parsedList = [];
     for (tokenList,
-        if (_ ~ '^\\(',
-            parsedList += parse(tokenize(_ ~ '(?<=.).*')),
+        if (slice(_, 0, 1) == '(',
+            parsedList += parse(tokenize(slice(_, 1))),
         (_ ~ '^[a-z]'), // Else if
             parsedList += _ ~ '^[a-z]+';
             args = _ ~ '(?<=\\().*';
@@ -349,7 +349,7 @@ __on_player_message(player, message) ->
         if (message ~ '^> ?show',
             schedule(0, _() -> print('= ' + global_answer)),
         // Else
-            expression = message ~ '(?<=.).*';
+            expression = slice(message, 1);
             expression = replace(expression, ' ', '');
             expression = lower(expression);
             expression = replace(expression, '(?<![\\d\\)])-(?=\\()', '-1*');
